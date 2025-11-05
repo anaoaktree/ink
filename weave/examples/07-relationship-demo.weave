@@ -1,0 +1,281 @@
+// Relationship Demo: Social Simulation
+// Demonstrates @character, @relationship, and @faction directives
+
+=== start ===
+Welcome to the Royal Court!
+
+You are a newly appointed diplomat tasked with navigating the complex web of court politics.
+
+// Register characters
+@character id="princess" name="Princess Elena" faction="royals"
+@character id="knight" name="Sir Marcus" faction="military"
+@character id="merchant" name="Lady Thorne" faction="traders"
+
+// Register factions
+@faction id="royals" name="The Royal Family" rep=50
+@faction id="military" name="The Knight's Order" rep=0
+@faction id="traders" name="The Merchant's Guild" rep=0
+
+Your success depends on building relationships and managing faction reputations.
+
+* [Attend the morning court] -> morning_court
+
+=== morning_court ===
+@scene bg="throne_room.jpg" music="royal_theme.mp3"
+
+The throne room is filled with nobles, knights, and merchants.
+
+Princess Elena sits on the throne, presiding over court matters.
+
+* [Approach the Princess] -> meet_princess
+* [Speak with Sir Marcus] -> meet_knight
+* [Chat with Lady Thorne] -> meet_merchant
+
+=== meet_princess ===
+@char name="Princess Elena" portrait="elena_neutral.jpg"
+
+"Ah, our new diplomat!" Princess Elena greets you.
+
+"I trust you'll serve the crown well."
+
+* [Bow respectfully] -> princess_respect
+* [Speak casually] -> princess_casual
+
+=== princess_respect ===
+@relationship with="princess" affection=+10 respect=+15
+@faction id="royals" rep=+10
+
+You bow deeply. "Your Highness, I am honored to serve."
+
+The Princess smiles approvingly.
+
+"I can see you understand proper protocol. We shall get along well."
+
+{$rel.princess.respect > 60}
+  "In fact, I have a sensitive diplomatic mission that requires someone I can trust..."
+  -> princess_quest
+{else}
+  "Continue to serve loyally, and you will rise in the court."
+  -> court_mingling
+{/}
+
+=== princess_casual ===
+@relationship with="princess" affection=+5 respect=-5
+
+"Hey, nice to meet you!" you say with a friendly wave.
+
+The Princess raises an eyebrow at your informal manner.
+
+"I... see. Do remember that we maintain certain standards here."
+
+-> court_mingling
+
+=== princess_quest ===
+@relationship with="princess" trust=+20
+
+Princess Elena leans in conspiratorially.
+
+"There are tensions between the Knights and the Merchants. I need you to mediate."
+
+"Build bridges between them. The stability of the realm depends on it."
+
+* [Accept the mission] -> diplomatic_mission
+
+=== meet_knight ===
+@char name="Sir Marcus" portrait="marcus_armor.jpg"
+
+Sir Marcus stands tall in his gleaming armor.
+
+"You're the new diplomat? Let's see if you're worth your salt."
+
+* [Challenge him to a sparring match] -> knight_spar
+* [Ask about his military campaigns] -> knight_talk
+
+=== knight_spar ===
+@relationship with="knight" respect=+20 rivalry=+10
+@faction id="military" rep=+15
+
+"A sparring match? Bold!" Marcus grins.
+
+You exchange blows in the training yard. Though he clearly holds back, you manage to land a few hits.
+
+"You've got spirit! I respect that."
+
+{$rel.knight.respect > 30}
+  "The Order could use someone like you. We have a mission against bandits in the northern pass..."
+  -> knight_quest
+{else}
+  "Keep training. You show promise."
+  -> court_mingling
+{/}
+
+=== knight_talk ===
+@relationship with="knight" friendship=+10
+@faction id="military" rep=+5
+
+"Ah, you want to hear war stories?" Marcus's eyes light up.
+
+He regales you with tales of battles and heroism.
+
+You listen attentively, asking thoughtful questions.
+
+-> court_mingling
+
+=== knight_quest ===
+"I need a diplomatic envoy to negotiate with the mountain clans."
+
+"They respect strength. If you've earned my trust, you can earn theirs."
+
+* [Accept the mission] -> military_mission
+
+=== meet_merchant ===
+@char name="Lady Thorne" portrait="thorne_smile.jpg"
+
+Lady Thorne regards you with calculating eyes.
+
+"A diplomat? Excellent. Perhaps we can do business."
+
+* [Discuss trade agreements] -> merchant_trade
+* [Ask about guild politics] -> merchant_politics
+
+=== merchant_trade ===
+@relationship with="merchant" trust=+15 affection=+5
+@faction id="traders" rep=+10
+
+"Trade is the lifeblood of the kingdom," Lady Thorne explains.
+
+She outlines various commercial opportunities and how diplomacy can facilitate them.
+
+{$rel.merchant.trust > 40}
+  "I have a proposal that could benefit both of us greatly..."
+  -> merchant_quest
+{else}
+  "We should speak again when you've proven yourself reliable."
+  -> court_mingling
+{/}
+
+=== merchant_politics ===
+@relationship with="merchant" affection=+10
+
+Lady Thorne leans in, speaking softly.
+
+"The Merchant's Guild has many... interests. And many rivals."
+
+She shares insights into the complex web of trade politics.
+
+-> court_mingling
+
+=== merchant_quest ===
+"There's a trade route the Knights have blocked for 'security reasons.'"
+
+"Convince Sir Marcus to reopen it, and the Guild will be in your debt."
+
+* [Accept the mission] -> diplomatic_mission
+
+=== court_mingling ===
+You've made some initial connections at court.
+
+{$rel.princess.status == "friend"}
+  Princess Elena considers you a trusted ally.
+{/}
+
+{$rel.knight.status == "friend"}
+  Sir Marcus respects you as a fellow warrior.
+{/}
+
+{$rel.merchant.status == "friend"}
+  Lady Thorne sees you as a valuable business partner.
+{/}
+
+* [Continue diplomatic work] -> diplomatic_mission
+
+=== diplomatic_mission ===
+Over the following weeks, you work to balance competing interests:
+
+{$faction.military.standing == "friendly" && $faction.traders.standing == "friendly"}
+  You successfully mediate between the Knights and Merchants!
+
+  A compromise is reached: enhanced security on trade routes satisfies both parties.
+
+  @faction id="royals" rep=+25
+  @relationship with="princess" trust=+30
+
+  -> diplomatic_success
+{else}
+  Your diplomatic efforts continue...
+
+  {$faction.military.standing != "friendly"}
+    You need to build better relations with the Knight's Order.
+  {/}
+
+  {$faction.traders.standing != "friendly"}
+    You need to win the trust of the Merchant's Guild.
+  {/}
+
+  * [Visit Sir Marcus] -> meet_knight
+  * [Visit Lady Thorne] -> meet_merchant
+{/}
+
+=== diplomatic_success ===
+@scene bg="throne_room.jpg" music="victory.mp3"
+
+Princess Elena addresses the court:
+
+"Our new diplomat has achieved what many thought impossible!"
+
+"Through wisdom and perseverance, the realm is more united than ever."
+
+{$rel.princess.romance > 50}
+  She meets your eyes with a warm smile. Something more than professional respect passes between you.
+
+  "Perhaps we should discuss your future role... in private."
+
+  -> romance_ending
+{/}
+
+{$rel.princess.status == "close_friend"}
+  "You have proven yourself a true friend to the crown. I name you Royal Ambassador!"
+
+  -> success_ending
+{/}
+
+-> success_ending
+
+=== romance_ending ===
+In the quiet of the palace gardens, Princess Elena takes your hand.
+
+"You've won not just my respect, but my heart."
+
+The future holds not just diplomatic triumphs, but something far more precious.
+
+-> END
+
+=== success_ending ===
+Your diplomatic career flourishes.
+
+Through careful relationship building and faction management, you've secured your place in history.
+
+Relationships:
+{$rel.princess.status}: Princess Elena
+{$rel.knight.status}: Sir Marcus
+{$rel.merchant.status}: Lady Thorne
+
+Faction standings:
+{$faction.royals.standing}: Royal Family
+{$faction.military.standing}: Knight's Order
+{$faction.traders.standing}: Merchant's Guild
+
+-> END
+
+=== military_mission ===
+// Path focused on military faction
+@faction id="military" rep=+20
+
+You embark on the military mission...
+
+// This would branch into military-focused gameplay
+
+-> success_ending
+
+=== END ===
+The end of your story... for now.

@@ -41,6 +41,8 @@ export type ContentNode =
   | VariableDeclaration
   | Assignment
   | MediaDirective
+  | TimelineDirective
+  | RelationshipDirective
 
 // Plain text content
 export interface TextNode extends Node {
@@ -89,10 +91,24 @@ export interface Assignment extends Node {
   value: Expression
 }
 
-// Media directives (@image, @audio, @video, @scene)
+// Media directives (@image, @audio, @video, @scene, @char)
 export interface MediaDirective extends Node {
   type: 'MediaDirective'
-  mediaType: 'image' | 'audio' | 'video' | 'scene'
+  mediaType: 'image' | 'audio' | 'video' | 'scene' | 'char'
+  properties: Record<string, string | number | boolean>
+}
+
+// Timeline directives (@timeline, @time, @schedule)
+export interface TimelineDirective extends Node {
+  type: 'TimelineDirective'
+  directiveType: 'timeline' | 'time' | 'schedule'
+  properties: Record<string, string | number | boolean>
+}
+
+// Relationship directives (@character, @relationship, @faction)
+export interface RelationshipDirective extends Node {
+  type: 'RelationshipDirective'
+  directiveType: 'character' | 'relationship' | 'faction'
   properties: Record<string, string | number | boolean>
 }
 
@@ -170,3 +186,5 @@ export type Instruction =
   | { type: 'var'; name: string; value?: any }
   | { type: 'assign'; variable: string; operator: string; value: any }
   | { type: 'media'; mediaType: string; properties: Record<string, any> }
+  | { type: 'timeline'; directiveType: string; properties: Record<string, any> }
+  | { type: 'relationship'; directiveType: string; properties: Record<string, any> }

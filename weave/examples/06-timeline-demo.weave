@@ -1,0 +1,182 @@
+// Timeline Demo: Time-Sensitive Quest
+// Demonstrates @timeline, @time, and @schedule directives
+
+=== start ===
+@timeline start=480 scale=1 dayLength=1440
+
+You wake up to your alarm blaring.
+
+var quest_accepted = false
+var met_deadline = false
+
+* [Check the time] -> check_time
+* [Get ready] -> get_ready
+
+=== check_time ===
+The clock reads 8:00 AM.
+
+You remember - there's a meeting with the guild master at noon!
+
+* [Better hurry!] -> get_ready
+
+=== get_ready ===
+@time advance=30
+
+You shower, dress, and grab a quick breakfast.
+
+Half an hour passes.
+
+* [Head to the guild hall] -> guild_hall
+* [Train for a bit first] -> morning_training
+
+=== morning_training ===
+@time advance=60
+
+You spend an hour practicing your swordplay.
+
+{$time.hour >= 12}
+  Oh no! You're late for the meeting!
+  -> late_arrival
+{else}
+  You feel more prepared now.
+  -> guild_hall
+{/}
+
+=== guild_hall ===
+You arrive at the guild hall.
+
+{$time.hour < 12}
+  You made it with time to spare!
+  -> on_time_arrival
+{else}
+  The guild master looks annoyed at your tardiness.
+  -> late_arrival
+{/}
+
+=== on_time_arrival ===
+~ met_deadline = true
+
+"Right on time!" the guild master greets you warmly.
+
+"I have an urgent quest. A monster has been spotted in the nearby forest."
+
+"It only appears at night. You'll need to wait for darkness."
+
+~ quest_accepted = true
+
+* [Accept the quest] -> wait_for_night
+
+=== late_arrival ===
+"You're late," the guild master says coldly.
+
+"The quest has already been given to another adventurer."
+
+Your reputation takes a hit.
+
+-> failed_ending
+
+=== wait_for_night ===
+@schedule at=1200 goto=evening_arrives
+
+You spend the afternoon preparing:
+- Sharpening your sword
+- Stocking up on potions
+- Reviewing monster weaknesses
+
+Time passes slowly as you wait for evening...
+
+* [Rest until nightfall] -> rest
+
+=== rest ===
+@time advance=360
+
+You rest for 6 hours.
+
+-> evening_arrives
+
+=== evening_arrives ===
+{$time.period == "night"}
+  The sun has set. Darkness falls over the town.
+
+  It's time to hunt the monster!
+
+  * [Enter the forest] -> night_forest
+{else}
+  The evening approaches. You prepare for the hunt.
+
+  @time advance=120
+
+  -> evening_arrives
+{/}
+
+=== night_forest ===
+@scene bg="dark_forest.jpg" music="ominous.mp3"
+
+You venture into the dark forest.
+
+The moon casts eerie shadows between the trees.
+
+{$time.hour >= 0 && $time.hour < 4}
+  This is the witching hour - when monsters are most active!
+
+  You hear a growl...
+
+  * [Draw your weapon] -> monster_encounter
+{else}
+  It's still too early. You need to wait for deeper darkness.
+
+  @time advance=60
+
+  -> night_forest
+{/}
+
+=== monster_encounter ===
+@audio play="monster_roar.mp3"
+@image show="forest_monster.png"
+
+A massive beast emerges from the shadows!
+
+{met_deadline}
+  Your morning training pays off - you feel confident!
+
+  You fight bravely and slay the beast!
+
+  -> victory_ending
+{else}
+  Without proper preparation, the fight is difficult.
+
+  You barely manage to drive the beast away.
+
+  -> partial_victory
+{/}
+
+=== victory_ending ===
+@time advance=60
+
+After an hour of intense combat, you emerge victorious!
+
+You return to the guild hall at dawn with proof of your kill.
+
+"Excellent work!" the guild master praises you.
+
+Your reputation soars. Quest complete!
+
+-> END
+
+=== partial_victory ===
+The beast flees, wounded but alive.
+
+You return to the guild hall, exhausted.
+
+"At least you survived," the guild master says.
+
+"But the monster still lives. Someone else will have to finish it."
+
+-> END
+
+=== failed_ending ===
+Sometimes timing is everything.
+
+Maybe next time you'll be more punctual.
+
+-> END

@@ -98,6 +98,20 @@ export class Compiler {
           properties: node.properties,
         }
 
+      case 'TimelineDirective':
+        return {
+          type: 'timeline',
+          directiveType: node.directiveType,
+          properties: node.properties,
+        }
+
+      case 'RelationshipDirective':
+        return {
+          type: 'relationship',
+          directiveType: node.directiveType,
+          properties: node.properties,
+        }
+
       default:
         throw new Error(`Unknown node type: ${(node as any).type}`)
     }

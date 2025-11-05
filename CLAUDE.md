@@ -509,3 +509,61 @@ INFO:
 **Differentiator**: Best-in-class developer experience - no competitor has all 3 tools.
 
 **Next**: Sprint 5 (Timeline + Relationships) or production-ready packaging
+
+### 2025-11-05 Session 2 (Continued): Phase 2 COMPLETE ✅
+
+**Status**: Timeline & Relationship Systems DELIVERED
+
+**What Was Built**:
+- ✅ Timeline System (time tracking, day/night cycles, scheduled events)
+- ✅ Relationship System (character relationships, faction reputation)
+- ✅ Extended parser for timeline/relationship directives
+- ✅ Extended compiler to handle new instruction types
+- ✅ Integrated systems into runtime
+- ✅ Two comprehensive example stories
+- ✅ Complete Phase 2 documentation
+
+**New Features**:
+
+**Timeline System**:
+- Track in-game time (hours, days, seasons)
+- Automatic day/night cycle detection
+- Time advancement (@time advance=60)
+- Scheduled events (@schedule at=720 goto=event)
+- Repeating events (daily, custom intervals)
+- Time-based conditionals ({$time.hour > 18})
+- Period detection (dawn, morning, afternoon, evening, night)
+
+**Relationship System**:
+- Character registration (@character id="sarah" name="Sarah")
+- Multi-dimensional relationships (affection, trust, respect, romance, friendship, rivalry)
+- Automatic status calculation (stranger → friend → romance)
+- Relationship modification (@relationship with="sarah" affection=+10)
+- Faction system (@faction id="rebels" rep=25)
+- Faction standing (hostile → neutral → allied)
+- Relationship conditionals ({$rel.sarah.status == "friend"})
+
+**Code Statistics**:
+- timeline-system.ts: ~200 lines (complete system)
+- relationship-system.ts: ~240 lines (complete system)
+- Parser extensions: ~100 lines (directive handling)
+- Compiler extensions: ~15 lines (instruction generation)
+- Runtime integration: ~120 lines (instruction handling)
+- Example 06-timeline-demo.weave: ~200 lines (time-sensitive quest)
+- Example 07-relationship-demo.weave: ~300 lines (court politics)
+- phase-2-features.md: ~600 lines (documentation)
+- Total Phase 2: ~1,775 lines
+
+**Differentiator**: **Weave is now the ONLY narrative engine with first-class timeline and relationship systems built into the language.** No competitor (Ink, Twine, Ren'Py, Narrat) has these as native features.
+
+**Use Cases Unlocked**:
+- Time-sensitive quests with deadlines
+- Day/night gameplay (different events at night)
+- Dating sims with complex romance mechanics
+- Political intrigue with faction management
+- Social simulators with friendship dynamics
+- Appointment systems (meet NPCs at specific times)
+- Seasonal events and calendar systems
+- Reputation systems and morality dynamics
+
+**Next**: Phase 3 features (Accessibility, Visual Debugger, Analytics) or user testing

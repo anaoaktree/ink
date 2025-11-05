@@ -3,6 +3,9 @@
  * Weave story runtime engine
  */
 
+import { Timeline, type TimeEvent } from '../../compiler/src/timeline-system.js'
+import { RelationshipSystem } from '../../compiler/src/relationship-system.js'
+
 export interface CompiledStory {
   version: string
   metadata: {
@@ -49,6 +52,8 @@ export class Story {
   private currentChoices: Array<{ text: string; target: string; index: number }> = []
   private eventHandlers: Map<EventType, EventHandler[]> = new Map()
   private ended: boolean = false
+  public timeline: Timeline = new Timeline()
+  public relationships: RelationshipSystem = new RelationshipSystem()
 
   constructor(compiledStory: CompiledStory) {
     this.story = compiledStory
@@ -167,6 +172,14 @@ export class Story {
           type: instruction.mediaType,
           properties: instruction.properties,
         })
+        return false
+
+      case 'timeline':
+        this.handleTimelineInstruction(instruction as any)
+        return false
+
+      case 'relationship':
+        this.handleRelationshipInstruction(instruction as any)
         return false
 
       case 'conditional':
@@ -374,5 +387,119 @@ export class Story {
    */
   getCurrentChoices(): Choice[] {
     return this.currentChoices.map((c) => ({ text: c.text, index: c.index }))
+  }
+
+  /**
+   * Handle timeline instructions
+   */
+  private handleTimelineInstruction(instruction: { directiveType: string; properties: Record<string, any> }): void {
+    const { directiveType, properties } = instruction
+
+    switch (directiveType) {
+      case 'timeline':
+        // Initialize timeline with config
+        this.timeline = new Timeline({
+          startTime: properties.start as number | undefined,
+          timeScale: properties.scale as number | undefined,
+          dayLength: properties.dayLength as number | undefined,
+        })
+        break
+
+      case 'time':
+        if (properties.advance !== undefined) {
+          const events = this.timeline.advance(properties.advance as number)
+          // Emit events that triggered
+          for (const event of events) {
+            this.emit('text', { content: `[Time advanced: ${properties.advance} minutes]` })
+            if (event.section) {
+              this.divertTo(event.section)
+            }
+          }
+        }
+        break
+
+      case 'schedule':
+        if (properties.at !== undefined && properties.goto !== undefined) {
+          this.timeline.scheduleEvent({
+            id: `event_${Date.now()}`,
+            triggerTime: properties.at as number,
+            section: properties.goto as string,
+            repeating: properties.repeat !== undefined,
+            interval: properties.repeat === 'daily' ? 1440 : undefined,
+          })
+        }
+        break
+    }
+
+    // Emit timeline state
+    this.emit('media', {
+      type: 'timeline',
+      state: this.timeline.getState(),
+    })
+  }
+
+  /**
+   * Handle relationship instructions
+   */
+  private handleRelationshipInstruction(instruction: {
+    directiveType: string
+    properties: Record<string, any>
+  }): void {
+    const { directiveType, properties } = instruction
+
+    switch (directiveType) {
+      case 'character':
+        this.relationships.registerCharacter({
+          id: properties.id as string,
+          name: properties.name as string,
+          faction: properties.faction as string | undefined,
+          traits: properties.traits as string[] | undefined,
+        })
+        break
+
+      case 'relationship':
+        if (properties.with) {
+          const charId = properties.with as string
+          // Apply relationship changes
+          for (const [key, value] of Object.entries(properties)) {
+            if (key !== 'with' && typeof value === 'number') {
+              this.relationships.modifyRelationship(charId, key as any, value)
+            }
+          }
+        }
+        break
+
+      case 'faction':
+        this.relationships.registerFaction({
+          id: properties.id as string,
+          name: properties.name as string,
+          reputation: (properties.rep as number) || 0,
+          standing: 'neutral',
+        })
+        if (properties.rep !== undefined) {
+          this.relationships.modifyFaction(properties.id as string, 0) // Trigger standing update
+        }
+        break
+    }
+
+    // Emit relationship state
+    this.emit('media', {
+      type: 'relationship',
+      summary: this.relationships.getSummary(),
+    })
+  }
+
+  /**
+   * Get timeline (for external access)
+   */
+  getTimeline(): Timeline {
+    return this.timeline
+  }
+
+  /**
+   * Get relationship system (for external access)
+   */
+  getRelationships(): RelationshipSystem {
+    return this.relationships
   }
 }

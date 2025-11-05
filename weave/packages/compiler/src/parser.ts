@@ -97,8 +97,8 @@ export class Parser {
 
       // Check what kind of content this is
       if (this.peek() === '@') {
-        // Media directive (@image, @audio, @video, @scene, @char)
-        content.push(this.parseMediaDirective())
+        // Parse @ directives (media, timeline, relationship)
+        content.push(this.parseDirective())
       } else if (this.peek(3) === 'var' && !this.isAlphaNumeric(this.peek(1, 3))) {
         // Variable declaration
         content.push(this.parseVariableDeclaration())
@@ -334,6 +334,29 @@ export class Parser {
     throw this.error(`Unknown type: ${type}`)
   }
 
+  private parseDirective(): import('./ast.js').ContentNode {
+    // Route to appropriate directive parser based on type
+    this.expect('@')
+    const directiveType = this.parseIdentifier()
+
+    // Put back the @ and directive name
+    this.pos -= directiveType.length + 1
+
+    const mediaTypes = ['image', 'audio', 'video', 'scene', 'char']
+    const timelineTypes = ['timeline', 'time', 'schedule']
+    const relationshipTypes = ['character', 'relationship', 'faction']
+
+    if (mediaTypes.includes(directiveType)) {
+      return this.parseMediaDirective()
+    } else if (timelineTypes.includes(directiveType)) {
+      return this.parseTimelineDirective()
+    } else if (relationshipTypes.includes(directiveType)) {
+      return this.parseRelationshipDirective()
+    } else {
+      throw this.error(`Unknown directive: @${directiveType}`)
+    }
+  }
+
   private parseMediaDirective(): import('./ast.js').MediaDirective {
     // @image show="pic.jpg" duration=2s fade=true
     // @audio play="music.mp3" loop=true volume=0.5
@@ -343,14 +366,54 @@ export class Parser {
 
     this.expect('@')
     const mediaType = this.parseIdentifier()
-
-    const validTypes = ['image', 'audio', 'video', 'scene', 'char']
-    if (!validTypes.includes(mediaType)) {
-      throw this.error(`Unknown media directive: @${mediaType}`)
-    }
-
     this.skipWhitespace()
 
+    const properties = this.parseDirectiveProperties()
+
+    return {
+      type: 'MediaDirective',
+      mediaType: mediaType as any,
+      properties,
+    }
+  }
+
+  private parseTimelineDirective(): import('./ast.js').TimelineDirective {
+    // @timeline start=480 scale=1
+    // @time advance=60
+    // @schedule at=720 goto=lunch_time repeat=daily
+
+    this.expect('@')
+    const directiveType = this.parseIdentifier()
+    this.skipWhitespace()
+
+    const properties = this.parseDirectiveProperties()
+
+    return {
+      type: 'TimelineDirective',
+      directiveType: directiveType as any,
+      properties,
+    }
+  }
+
+  private parseRelationshipDirective(): import('./ast.js').RelationshipDirective {
+    // @character id="sarah" name="Sarah" faction="rebels"
+    // @relationship with="sarah" affection=+10 trust=-5
+    // @faction id="rebels" name="The Rebellion" rep=25
+
+    this.expect('@')
+    const directiveType = this.parseIdentifier()
+    this.skipWhitespace()
+
+    const properties = this.parseDirectiveProperties()
+
+    return {
+      type: 'RelationshipDirective',
+      directiveType: directiveType as any,
+      properties,
+    }
+  }
+
+  private parseDirectiveProperties(): Record<string, string | number | boolean> {
     // Parse properties (key=value pairs)
     const properties: Record<string, string | number | boolean> = {}
 
@@ -369,11 +432,7 @@ export class Parser {
       }
     }
 
-    return {
-      type: 'MediaDirective',
-      mediaType: mediaType as any,
-      properties,
-    }
+    return properties
   }
 
   private parsePropertyValue(): string | number | boolean {
