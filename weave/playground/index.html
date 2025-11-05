@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weave Playground - Interactive Narrative Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        header {
+            background: #2d2d30;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #4ec9b0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1177bb;
+        }
+
+        button.secondary {
+            background: #3e3e42;
+        }
+
+        button.secondary:hover {
+            background: #4e4e52;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .editor-panel, .output-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #252526;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #3e3e42;
+            font-weight: 600;
+            color: #cccccc;
+        }
+
+        textarea {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 1rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        .output {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #252526;
+        }
+
+        .story-content {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .choice {
+            background: #3e3e42;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid #4ec9b0;
+        }
+
+        .choice:hover {
+            background: #4e4e52;
+        }
+
+        .error {
+            color: #f48771;
+            background: #2d1e1e;
+            padding: 1rem;
+            border-radius: 4px;
+            border-left: 3px solid #f48771;
+            margin-bottom: 1rem;
+        }
+
+        .success {
+            color: #4ec9b0;
+            margin-bottom: 0.5rem;
+        }
+
+        .info {
+            color: #9cdcfe;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .divider {
+            width: 1px;
+            background: #3e3e42;
+        }
+
+        .status {
+            font-size: 0.9rem;
+            color: #858585;
+        }
+
+        pre {
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🧵 Weave Playground</h1>
+        <div class="controls">
+            <button id="compileBtn">▶ Compile & Run</button>
+            <button id="resetBtn" class="secondary">↻ Reset</button>
+            <button id="exampleBtn" class="secondary">📝 Load Example</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="editor-panel">
+            <div class="panel-header">Editor (.weave)</div>
+            <textarea id="editor" placeholder="Write your Weave story here...
+
+Example:
+=== start ===
+Hello, world!
+
+* [Continue] -> next
+
+=== next ===
+Welcome to Weave Playground!
+
+-> END"></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="output-panel">
+            <div class="panel-header">Output <span class="status" id="status"></span></div>
+            <div class="output" id="output">
+                <div class="info">
+                    👋 Welcome to Weave Playground!
+                    <br><br>
+                    Write your story on the left, then click "Compile & Run" to see it in action.
+                    <br><br>
+                    Features:
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                        <li>✅ Real-time compilation</li>
+                        <li>✅ Interactive story playback</li>
+                        <li>✅ Instant error feedback</li>
+                        <li>✅ Example stories</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Weave parser and runtime (inline for playground)
+
+        const editor = document.getElementById('editor');
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const compileBtn = document.getElementById('compileBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const exampleBtn = document.getElementById('exampleBtn');
+
+        let currentStory = null;
+        let storyState = null;
+
+        // Simple parser
+        function parseWeave(source) {
+            const lines = source.trim().split('\n');
+            const sections = {};
+            let currentSection = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                if (line.startsWith('===') && line.endsWith('===')) {
+                    const name = line.replace(/===/g, '').trim();
+                    currentSection = { name, content: [] };
+                    sections[name] = currentSection;
+                } else if (currentSection && line) {
+                    currentSection.content.push(line);
+                }
+            }
+
+            return { sections, entryPoint: 'start' };
+        }
+
+        // Simple runtime
+        function runStory(story) {
+            storyState = {
+                currentSection: story.entryPoint,
+                output: [],
+                choices: [],
+                ended: false
+            };
+
+            continueStory();
+        }
+
+        function continueStory() {
+            if (storyState.ended) return;
+
+            const section = currentStory.sections[storyState.currentSection];
+            if (!section) {
+                showError(`Section not found: ${storyState.currentSection}`);
+                return;
+            }
+
+            storyState.output = [];
+            storyState.choices = [];
+
+            for (const line of section.content) {
+                if (line.startsWith('*')) {
+                    // Choice
+                    const match = line.match(/\*\s*\[(.*?)\]\s*->\s*(\w+)/);
+                    if (match) {
+                        storyState.choices.push({
+                            text: match[1],
+                            target: match[2]
+                        });
+                    }
+                } else if (line.startsWith('->')) {
+                    // Divert
+                    const target = line.replace('->', '').trim();
+                    if (target === 'END' || target === 'DONE') {
+                        storyState.ended = true;
+                    } else {
+                        storyState.currentSection = target;
+                        continueStory();
+                        return;
+                    }
+                } else if (!line.startsWith('//')) {
+                    // Text
+                    storyState.output.push(line);
+                }
+            }
+
+            renderOutput();
+        }
+
+        function makeChoice(index) {
+            if (index < 0 || index >= storyState.choices.length) return;
+
+            const choice = storyState.choices[index];
+            storyState.currentSection = choice.target;
+            continueStory();
+        }
+
+        function renderOutput() {
+            let html = '';
+
+            // Text content
+            if (storyState.output.length > 0) {
+                html += '<div class="story-content">';
+                html += storyState.output.join('<br><br>');
+                html += '</div>';
+            }
+
+            // Choices
+            if (storyState.choices.length > 0) {
+                storyState.choices.forEach((choice, i) => {
+                    html += `<div class="choice" onclick="makeChoice(${i})">${i + 1}. ${choice.text}</div>`;
+                });
+            } else if (storyState.ended) {
+                html += '<div class="success">✓ Story Complete</div>';
+            }
+
+            output.innerHTML = html;
+            status.textContent = `(Section: ${storyState.currentSection})`;
+        }
+
+        function showError(message) {
+            output.innerHTML = `<div class="error">❌ Error: ${message}</div>`;
+            status.textContent = '(Error)';
+        }
+
+        function showSuccess(message) {
+            output.innerHTML = `<div class="success">✓ ${message}</div>`;
+        }
+
+        // Event handlers
+        compileBtn.addEventListener('click', () => {
+            try {
+                const source = editor.value;
+                if (!source.trim()) {
+                    showError('Editor is empty. Write some Weave code first!');
+                    return;
+                }
+
+                currentStory = parseWeave(source);
+
+                if (!currentStory.sections.start) {
+                    showError('Story must have a "start" section. Add: === start ===');
+                    return;
+                }
+
+                showSuccess('Compiled successfully! Running story...');
+                setTimeout(() => runStory(currentStory), 500);
+            } catch (e) {
+                showError(e.message);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            if (currentStory) {
+                runStory(currentStory);
+            }
+        });
+
+        exampleBtn.addEventListener('click', () => {
+            editor.value = `=== start ===
+
+Welcome to the Weave Playground!
+
+This is a simple interactive story to demonstrate the basics.
+
+* [Learn about choices] -> choices
+* [Learn about diverts] -> diverts
+* [See a full example] -> example
+
+=== choices ===
+
+Choices let players make decisions that branch the story.
+
+Syntax: * [Choice text] -> destination
+
+You can have as many choices as you want!
+
+* [Go back] -> start
+* [Continue learning] -> diverts
+
+=== diverts ===
+
+Diverts let you jump to other sections automatically.
+
+Syntax: -> section_name
+
+This creates a seamless flow without player input.
+
+-> start
+
+=== example ===
+
+Here's a complete mini-story:
+
+You stand at a crossroads in a dark forest.
+
+* [Go left] -> left_path
+* [Go right] -> right_path
+
+=== left_path ===
+
+You take the left path and find a treasure chest!
+
+Inside is 100 gold pieces. Lucky you!
+
+* [Return to crossroads] -> example
+* [End adventure] -> END
+
+=== right_path ===
+
+You take the right path and encounter a friendly merchant.
+
+"Welcome, traveler!" they say.
+
+* [Talk to merchant] -> merchant
+* [Return to crossroads] -> example
+
+=== merchant ===
+
+The merchant sells you a map for 50 gold.
+
+"This will help on your journey!"
+
+-> END`;
+
+            showSuccess('Example loaded! Click "Compile & Run" to try it.');
+        });
+
+        // Global function for choice clicking
+        window.makeChoice = makeChoice;
+
+        // Auto-save to localStorage
+        editor.addEventListener('input', () => {
+            localStorage.setItem('weave_playground_code', editor.value);
+        });
+
+        // Load from localStorage
+        const saved = localStorage.getItem('weave_playground_code');
+        if (saved) {
+            editor.value = saved;
+        }
+    </script>
+</body>
+</html>
