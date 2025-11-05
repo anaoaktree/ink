@@ -96,7 +96,10 @@ export class Parser {
       if (this.isAtEnd() || this.peek(3) === '===') break
 
       // Check what kind of content this is
-      if (this.peek(3) === 'var' && !this.isAlphaNumeric(this.peek(1, 3))) {
+      if (this.peek() === '@') {
+        // Media directive (@image, @audio, @video, @scene, @char)
+        content.push(this.parseMediaDirective())
+      } else if (this.peek(3) === 'var' && !this.isAlphaNumeric(this.peek(1, 3))) {
         // Variable declaration
         content.push(this.parseVariableDeclaration())
       } else if (this.peek() === '~') {
@@ -329,6 +332,86 @@ export class Parser {
     }
     // Could extend for arrays etc
     throw this.error(`Unknown type: ${type}`)
+  }
+
+  private parseMediaDirective(): import('./ast.js').MediaDirective {
+    // @image show="pic.jpg" duration=2s fade=true
+    // @audio play="music.mp3" loop=true volume=0.5
+    // @video play="cutscene.mp4" onEnd=continue
+    // @scene bg="forest.jpg" music="ambient.mp3"
+    // @char name="Sarah" portrait="sarah_happy.jpg"
+
+    this.expect('@')
+    const mediaType = this.parseIdentifier()
+
+    const validTypes = ['image', 'audio', 'video', 'scene', 'char']
+    if (!validTypes.includes(mediaType)) {
+      throw this.error(`Unknown media directive: @${mediaType}`)
+    }
+
+    this.skipWhitespace()
+
+    // Parse properties (key=value pairs)
+    const properties: Record<string, string | number | boolean> = {}
+
+    while (!this.isAtEnd() && this.peek() !== '\n' && this.peek(3) !== '===') {
+      const key = this.parseIdentifier()
+      this.skipWhitespace()
+
+      if (this.peek() === '=') {
+        this.advance() // =
+        const value = this.parsePropertyValue()
+        properties[key] = value
+        this.skipWhitespace()
+      } else {
+        // Boolean flag (presence = true)
+        properties[key] = true
+      }
+    }
+
+    return {
+      type: 'MediaDirective',
+      mediaType: mediaType as any,
+      properties,
+    }
+  }
+
+  private parsePropertyValue(): string | number | boolean {
+    // Parse quoted string, number, or boolean
+    if (this.peek() === '"' || this.peek() === "'") {
+      const quote = this.peek()
+      this.advance()
+      let value = ''
+      while (this.peek() !== quote && !this.isAtEnd()) {
+        value += this.peek()
+        this.advance()
+      }
+      this.expect(quote)
+      return value
+    }
+
+    if (this.peek(4) === 'true') {
+      this.advance(4)
+      return true
+    }
+
+    if (this.peek(5) === 'false') {
+      this.advance(5)
+      return false
+    }
+
+    // Number or identifier
+    if (this.isDigit(this.peek())) {
+      let num = ''
+      while ((this.isDigit(this.peek()) || this.peek() === '.') && !this.isAtEnd()) {
+        num += this.peek()
+        this.advance()
+      }
+      return parseFloat(num)
+    }
+
+    // Plain identifier value
+    return this.parseIdentifier()
   }
 
   private parseExpression(): Expression {

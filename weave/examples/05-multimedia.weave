@@ -1,0 +1,169 @@
+// Example 5: Multimedia Integration
+// Demonstrating Sprint 3 features: images, audio, video, scenes, characters
+
+=== start ===
+
+@scene bg="title_screen.jpg" music="main_theme.mp3"
+
+THE LAST JOURNEY
+
+A visual novel demo
+
+@audio play="click.mp3"
+
+* [Begin] -> chapter1
+
+=== chapter1 ===
+
+@scene bg="forest_morning.jpg" music="peaceful_forest.mp3"
+
+Chapter 1: The Forest
+
+You awaken in a sunlit forest clearing.
+
+@image show="protagonist_wakeup.png" duration=2 fade=true
+
+Birds chirp overhead. The air smells of pine and morning dew.
+
+* [Stand up] -> stand_up
+* [Look around] -> look_around
+
+=== stand_up ===
+
+@audio play="rustle.mp3"
+
+You rise to your feet, brushing leaves from your clothes.
+
+@image show="protagonist_standing.png" fade=true
+
+* [Continue] -> meet_stranger
+
+=== look_around ===
+
+@audio play="ambient_wind.mp3" loop=true volume=0.3
+
+You scan your surroundings carefully.
+
+@image show="forest_panorama.jpg" duration=3
+
+The forest stretches endlessly in all directions.
+
+* [Stand up] -> stand_up
+
+=== meet_stranger ===
+
+@scene bg="forest_path.jpg"
+@audio stop="peaceful_forest.mp3"
+@audio play="mysterious_theme.mp3" fade=true
+
+A figure emerges from the trees.
+
+@char name="Stranger" portrait="stranger_neutral.png"
+
+"You're finally awake," they say.
+
+* [Who are you?] -> ask_identity
+* [Where am I?] -> ask_location
+
+=== ask_identity ===
+
+@char name="Stranger" portrait="stranger_smile.png"
+
+"I am known by many names. But you may call me Guide."
+
+* [Where am I?] -> ask_location
+
+=== ask_location ===
+
+@char name="Stranger" portrait="stranger_serious.png"
+
+"You are at the crossroads between worlds."
+
+@audio play="dramatic_sting.mp3"
+
+"The path you choose here will determine everything."
+
+* [Show me the paths] -> show_paths
+
+=== show_paths ===
+
+@scene bg="crossroads.jpg" music="epic_theme.mp3"
+
+You follow the Guide to a fork in the road.
+
+@image show="two_paths.png"
+
+@char name="Guide" portrait="stranger_neutral.png"
+
+"Choose wisely, traveler."
+
+* [Take the light path] -> light_path
+* [Take the dark path] -> dark_path
+
+=== light_path ===
+
+@scene bg="sunny_meadow.jpg" music="uplifting_theme.mp3"
+
+@audio play="birds_chirping.mp3" loop=true volume=0.4
+
+You walk into brilliant sunlight.
+
+@image show="meadow_flowers.jpg" duration=3 fade=true
+
+The path ahead is clear and bright.
+
+@char name="Guide" portrait="stranger_smile.png"
+
+"A brave choice. May your journey be filled with hope."
+
+-> ending_good
+
+=== dark_path ===
+
+@scene bg="dark_forest.jpg" music="ominous_theme.mp3"
+
+@audio play="thunder.mp3"
+
+Storm clouds gather as you venture into shadow.
+
+@image show="lightning_flash.png" duration=1
+
+@char name="Guide" portrait="stranger_serious.png"
+
+"So be it. Face what lies ahead with courage."
+
+-> ending_uncertain
+
+=== ending_good ===
+
+@scene bg="sunrise.jpg" music="triumphant_theme.mp3"
+
+GOOD ENDING
+
+@image show="protagonist_victorious.png" fade=true duration=3
+
+You have chosen the path of light.
+
+Your journey has only just begun...
+
+@video play="credits.mp4"
+
+-> END
+
+=== ending_uncertain ===
+
+@scene bg="stormy_night.jpg" music="mysterious_theme.mp3"
+
+UNCERTAIN ENDING
+
+@image show="protagonist_shadow.png" fade=true duration=3
+
+You have chosen the path of shadow.
+
+What awaits you in the darkness?
+
+@video play="teaser.mp4"
+
+TO BE CONTINUED...
+
+-> END
