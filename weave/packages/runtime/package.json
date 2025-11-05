@@ -1,0 +1,14 @@
+{
+  "name": "@weave-lang/runtime",
+  "version": "0.1.0",
+  "description": "Weave language runtime - executes compiled Weave stories",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "keywords": ["weave", "runtime", "narrative", "game-engine"],
+  "author": "Claude",
+  "license": "MIT"
+}

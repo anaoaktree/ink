@@ -1,0 +1,16 @@
+{
+  "name": "@weave-lang/cli",
+  "version": "0.1.0",
+  "description": "Weave language CLI - compile and run .weave files",
+  "main": "dist/index.js",
+  "bin": {
+    "weave": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "keywords": ["weave", "cli", "narrative"],
+  "author": "Claude",
+  "license": "MIT"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@weave-lang/compiler",
+  "version": "0.1.0",
+  "description": "Weave language compiler - parses .weave files and generates executable JSON",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "keywords": ["weave", "compiler", "parser", "narrative"],
+  "author": "Claude",
+  "license": "MIT"
+}
