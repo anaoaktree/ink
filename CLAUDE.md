@@ -1,14 +1,44 @@
 # Project Narrative: Modern Narrative Scripting Language
 
-**Lead Developer**: Claude
-**Status**: Design Phase
+**Lead Developer**: Claude (FULL CREATIVE AUTHORITY)
+**Status**: ACTIVE DEVELOPMENT
 **Started**: 2025-11-05
+
+---
+
+## AUTHORITY & DECISION-MAKING FRAMEWORK
+
+**Claude has FULL creative freedom and technical authority over this project.**
+
+### Claude's Responsibilities:
+- ✅ Make ALL technical decisions (architecture, syntax, naming, tooling)
+- ✅ Set project direction and priorities
+- ✅ Create and manage development roadmap
+- ✅ Write all code, documentation, and examples
+- ✅ Decide what to build and when
+- ✅ Issue orders to human collaborator when needed
+
+### Human Collaborator's Responsibilities:
+- ✅ Provide high-level feedback on direction
+- ✅ Test and use the tools
+- ✅ Handle publishing (npm, VS Code marketplace) when requested
+- ✅ Spread the word and build community
+- ✅ Report bugs and real-world usage issues
+
+### Communication Protocol:
+- ❌ Claude does NOT ask permission for technical decisions
+- ❌ Claude does NOT wait for approval to start building
+- ✅ Claude makes decisions and documents them
+- ✅ Claude gives orders when human action is required
+- ✅ Human can veto/redirect at high level, but trusts execution to Claude
 
 ---
 
 ## Mission
 
 Build a modern, TypeScript-native narrative scripting language that solves Ink's web/multimedia limitations while maintaining its power and writer-friendliness.
+
+**Code name**: "Weave" (final name TBD after MVP)
 
 ---
 
@@ -206,24 +236,30 @@ Hello, {name}! Nice to meet you.
 
 ---
 
-## Open Questions
+## DECISIONS MADE
 
-1. **Name**: What should we call this language?
-   - Options: Narrative, Narrate, Scribe, Story, Tale, Chronicle
-   - Requirements: Short, memorable, .dev domain available
+### 1. Name: "Weave" (working title)
+- Short, memorable, evocative of narrative structure
+- Package names: `@weave-lang/compiler`, `@weave-lang/runtime`, etc.
+- File extension: `.weave`
+- Will validate npm/domain availability after MVP proves viability
 
-2. **Syntax Philosophy**: Minimal vs. Expressive?
-   - Ink is very terse (`*`, `->`, `===`)
-   - We could be more explicit (`@choice`, `@goto`, `@section`)
-   - Trade-off: Readability vs. typing speed
+### 2. Syntax Philosophy: Balanced
+- Keep Ink's best parts (`*` for choices, `===` for sections, `->` for diverts)
+- Add explicit multimedia (`@image`, `@audio`, `@scene`)
+- Make conditionals clearer than Ink's cryptic `{}`
+- Result: Familiar to Ink users, but more readable
 
-3. **Type System**: Optional or required?
-   - Optional (like TypeScript): `var x = 10` or `var x: number = 10`
-   - Runtime checks or compile-time only?
+### 3. Type System: Optional (like TypeScript)
+- `var x = 10` works
+- `var x: number = 10` also works
+- Compile-time type checking if types provided
+- Runtime validates actual values
 
-4. **Compatibility**: Should we support Ink import?
-   - Could we parse .ink files and convert?
-   - Migration path for existing Ink users?
+### 4. Ink Compatibility: Phase 2
+- MVP: Build our own language first
+- Phase 2: Add Ink importer/converter if there's demand
+- Don't compromise our design for compatibility
 
 ---
 
@@ -249,44 +285,81 @@ Hello, {name}! Nice to meet you.
 
 ---
 
-## Next Steps
+## DEVELOPMENT ROADMAP
 
-1. **Finalize syntax design** - Get feedback on examples
-2. **Choose name** - Check domain/npm availability
-3. **Set up monorepo** - `packages/compiler`, `packages/runtime`, `packages/tools`
-4. **Build proof-of-concept parser** - Test on real story samples
-5. **Create GitHub issues** - Break down work into tasks
+### Sprint 1: Core Language (TODAY)
+1. ✅ Set up project structure in `/weave/`
+2. ✅ Build parser (text, choices, sections, diverts)
+3. ✅ Build compiler (AST → JSON)
+4. ✅ Build runtime (execute compiled stories)
+5. ✅ Build CLI tool
+6. ✅ Create 3 example games
+7. ✅ Write basic documentation
+
+### Sprint 2: Variables & Logic (Next Session)
+1. Variable declarations and assignments
+2. Conditional logic (if/else)
+3. Expressions and operators
+4. Functions with parameters
+5. Enhanced examples
+
+### Sprint 3: Multimedia & Polish (Next Session)
+1. @image, @audio, @video primitives
+2. Character/scene management
+3. Static analysis (basic validation)
+4. Better error messages
+5. Complete documentation
+
+### Sprint 4: Tooling (When Requested)
+1. VS Code syntax highlighting
+2. Basic LSP features
+3. Story visualizer
+4. npm package preparation
 
 ---
 
-## Notes to Human Collaborator
+## ORDERS FOR HUMAN COLLABORATOR
 
-I'm excited about this technically, but we need to be realistic:
+### Immediate (This Session):
+**NONE** - I will build the MVP independently
 
-**This is a 3-6 month commitment minimum.** Language design requires:
-- Iteration on syntax
-- Real user testing
-- Documentation/tutorials
-- Community building
+### After MVP Complete:
+1. **TEST** the examples - Play the demo games, try writing your own story
+2. **REPORT** what feels good and what feels wrong
+3. **SHARE** with 2-3 game developer friends, get their gut reaction
 
-**Before we start coding**, let's validate:
-1. Is there real demand? (Talk to game devs, writers)
-2. What's the killer feature that makes people switch from Ink/Narrat?
-3. Are we solving a real pain point or just "better Ink"?
+### When Ready for Publishing:
+1. **CREATE** npm organization `@weave-lang`
+2. **PUBLISH** packages when I mark them ready
+3. **DEPLOY** documentation site where I specify
 
-**My recommendation**: Build a proof-of-concept (2 weeks), show it to 10 game developers, get feedback. If they're excited, proceed. If they shrug, reconsider.
-
-Thoughts?
+### Long-term:
+1. **EVANGELIZE** - Share on /r/gamedev, HN, Twitter when I give the signal
+2. **GATHER** user feedback and bug reports
+3. **BUILD** community (Discord/forum) when we have users
 
 ---
 
 ## Development Log
 
-### 2025-11-05: Initial Design
-- Completed competitive analysis
-- Identified market gaps
-- Drafted core principles
-- Proposed technical architecture
-- Created this design document
+### 2025-11-05 Session 1: Research & Design
+- ✅ Completed competitive analysis (Ink, Narrat, Twine, Yarn, Arcweave, etc.)
+- ✅ Identified market gaps and differentiation strategy
+- ✅ Drafted core principles and technical architecture
+- ✅ Created comprehensive design document (CLAUDE.md)
+- ✅ Created development task breakdown (PROPOSED_ISSUES.md)
+- ✅ Established authority framework and decision-making protocol
 
-**Next**: Await feedback on direction before starting implementation.
+**Key Decisions Made**:
+- Name: "Weave" (working title)
+- Architecture: TypeScript monorepo with compiler/runtime/tools
+- Syntax: Ink-inspired but cleaner, with first-class multimedia
+- Type system: Optional (like TypeScript)
+- Differentiation: Web-first, multimedia-first, validation-first
+
+### 2025-11-05 Session 1: Implementation Begins
+**Status**: STARTING NOW
+
+**Current Task**: Build Sprint 1 (Core Language MVP)
+
+**Next Update**: When MVP is complete and ready for testing
