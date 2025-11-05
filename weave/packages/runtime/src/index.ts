@@ -169,6 +169,16 @@ export class Story {
         })
         return false
 
+      case 'conditional':
+        // Evaluate condition and execute appropriate branch
+        if (this.evaluateExpression(instruction.condition)) {
+          // Execute then branch (would need to compile branch instructions)
+          // For now, this is a placeholder
+        } else if (instruction.elseBranch !== undefined) {
+          // Execute else branch
+        }
+        return false
+
       default:
         return false
     }

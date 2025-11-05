@@ -96,7 +96,16 @@ export class Parser {
       if (this.isAtEnd() || this.peek(3) === '===') break
 
       // Check what kind of content this is
-      if (this.peek(2) === '->') {
+      if (this.peek(3) === 'var' && !this.isAlphaNumeric(this.peek(1, 3))) {
+        // Variable declaration
+        content.push(this.parseVariableDeclaration())
+      } else if (this.peek() === '~') {
+        // Assignment
+        content.push(this.parseAssignment())
+      } else if (this.peek() === '{' && this.peek(1, 1) !== '}') {
+        // Conditional block
+        content.push(this.parseConditional())
+      } else if (this.peek(2) === '->') {
         // Divert
         content.push(this.parseDivert())
       } else if (this.peek() === '*' || this.peek() === '+') {
@@ -206,6 +215,120 @@ export class Parser {
       type: 'Divert',
       target,
     }
+  }
+
+  private parseVariableDeclaration(): import('./ast.js').VariableDeclaration {
+    // var name = value or var name: type = value
+    this.expect('var')
+    this.skipWhitespace()
+
+    const name = this.parseIdentifier()
+    this.skipWhitespace()
+
+    // Optional type annotation
+    let valueType: import('./ast.js').TypeAnnotation | undefined
+    if (this.peek() === ':') {
+      this.advance() // :
+      this.skipWhitespace()
+      valueType = this.parseTypeAnnotation()
+      this.skipWhitespace()
+    }
+
+    // Optional initial value
+    let initialValue: Expression | undefined
+    if (this.peek() === '=') {
+      this.advance() // =
+      this.skipWhitespace()
+      initialValue = this.parseExpression()
+    }
+
+    return {
+      type: 'VariableDeclaration',
+      name,
+      valueType,
+      initialValue,
+    }
+  }
+
+  private parseAssignment(): import('./ast.js').Assignment {
+    // ~ variable = value or ~ variable += value
+    this.expect('~')
+    this.skipWhitespace()
+
+    const variable = this.parseIdentifier()
+    this.skipWhitespace()
+
+    // Operator
+    let operator: '=' | '+=' | '-=' | '*=' | '/=' = '='
+    if (this.match(['+=', '-=', '*=', '/='])) {
+      operator = this.source.substring(this.pos - 2, this.pos) as any
+    } else {
+      this.expect('=')
+    }
+
+    this.skipWhitespace()
+    const value = this.parseExpression()
+
+    return {
+      type: 'Assignment',
+      variable,
+      operator,
+      value,
+    }
+  }
+
+  private parseConditional(): import('./ast.js').ConditionalNode {
+    // { condition } content {else} content {/}
+    this.expect('{')
+    const condition = this.parseExpression()
+    this.expect('}')
+    this.skipWhitespace()
+
+    // Parse then branch until {else} or {/}
+    const thenBranch: ContentNode[] = []
+    while (!this.isAtEnd() && this.peek() !== '{') {
+      const text = this.parseText()
+      if (text.content.trim()) {
+        thenBranch.push(text)
+      }
+      if (this.peek() === '{') break
+    }
+
+    // Optional else branch
+    let elseBranch: ContentNode[] | undefined
+    if (this.peek(6) === '{else}') {
+      this.advance(6)
+      this.skipWhitespace()
+
+      elseBranch = []
+      while (!this.isAtEnd() && this.peek(2) !== '{/') {
+        const text = this.parseText()
+        if (text.content.trim()) {
+          elseBranch.push(text)
+        }
+        if (this.peek(2) === '{/') break
+      }
+    }
+
+    // Closing {/}
+    this.expect('{/')
+    this.expect('}')
+
+    return {
+      type: 'Conditional',
+      condition,
+      thenBranch,
+      elseBranch,
+    }
+  }
+
+  private parseTypeAnnotation(): import('./ast.js').TypeAnnotation {
+    const type = this.parseIdentifier()
+    if (type === 'string' || type === 'number' || type === 'boolean') {
+      return type
+    }
+    // Could extend for arrays etc
+    throw this.error(`Unknown type: ${type}`)
   }
 
   private parseExpression(): Expression {

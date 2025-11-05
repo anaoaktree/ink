@@ -1,0 +1,131 @@
+// Example 4: Variables and State
+// Demonstrating Sprint 2 features: variables, conditionals, assignments
+
+=== start ===
+
+var health = 100
+var gold = 50
+var has_sword = false
+
+You are a wandering adventurer.
+
+Health: {health}
+Gold: {gold}
+
+What do you want to do?
+
+* [Visit the shop] -> shop
+* [Go to the forest] -> forest
+* [Check your status] -> status
+
+=== shop ===
+
+You enter a dusty old shop.
+
+The merchant eyes you carefully.
+
+"I have a fine sword for sale. Only 40 gold pieces!"
+
+{gold >= 40}
+  * [Buy the sword] -> buy_sword
+{/}
+
+* [Leave the shop] -> start
+
+=== buy_sword ===
+
+You purchase the sword!
+
+~ gold -= 40
+~ has_sword = true
+
+The merchant hands you a gleaming blade.
+
+Gold remaining: {gold}
+
+-> start
+
+=== forest ===
+
+You venture into the dark forest.
+
+{has_sword}
+  With your sword in hand, you feel confident.
+{else}
+  You feel vulnerable without a weapon.
+{/}
+
+Suddenly, a wolf appears!
+
+{has_sword}
+  * [Fight the wolf] -> fight_wolf
+{/}
+
+* [Run away] -> run_away
+
+=== fight_wolf ===
+
+~ health -= 20
+
+You fight the wolf with your sword!
+
+The wolf bites you, but you strike back and defeat it!
+
+Health: {health}
+
+{health < 50}
+  You're badly wounded. You should rest.
+{else}
+  You're still in good shape.
+{/}
+
+* [Return to town] -> start
+
+=== run_away ===
+
+~ health -= 30
+
+You try to run, but the wolf catches you!
+
+You barely escape with your life.
+
+Health: {health}
+
+{health <= 0}
+  -> game_over
+{else}
+  * [Limp back to town] -> start
+{/}
+
+=== status ===
+
+=== CURRENT STATUS ===
+
+Health: {health}
+Gold: {gold}
+Has Sword: {has_sword}
+
+{health > 75}
+  You're in excellent condition.
+{else if health > 50}
+  You've taken some damage.
+{else if health > 25}
+  You're badly hurt!
+{else}
+  You're barely alive!
+{/}
+
+* [Continue] -> start
+
+=== game_over ===
+
+GAME OVER
+
+You have died in the forest.
+
+Final Stats:
+- Health: {health}
+- Gold: {gold}
+- Sword: {has_sword}
+
+-> END
