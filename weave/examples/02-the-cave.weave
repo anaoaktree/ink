@@ -1,0 +1,76 @@
+// Example 2: The Cave
+// A simple adventure demonstrating branching narrative
+
+=== start ===
+
+You stand at the entrance of a dark cave.
+
+The air is cool and damp. You can hear water dripping somewhere deep inside.
+
+* [Enter the cave] -> inside
+* [Walk away] -> walk_away
+
+=== inside ===
+
+You step into the darkness. Your eyes slowly adjust.
+
+The cave splits into two passages.
+
+* [Take the left passage] -> left_passage
+* [Take the right passage] -> right_passage
+* [Go back outside] -> start
+
+=== left_passage ===
+
+You walk down the left passage. It grows narrower and narrower.
+
+Eventually, you reach a dead end. There's something glittering in the wall...
+
+It's a vein of gold! But you have no tools to mine it.
+
+* [Go back] -> inside
+
+=== right_passage ===
+
+The right passage opens into a large cavern.
+
+In the center, you see a chest. It's unlocked.
+
+* [Open the chest] -> treasure
+* [Leave it alone] -> leave_chest
+
+=== treasure ===
+
+You open the chest and find it filled with ancient coins!
+
+You're rich! You grab what you can carry and head back.
+
+-> victory
+
+=== leave_chest ===
+
+You decide not to disturb the chest. Who knows what traps might be waiting?
+
+You carefully back away and return to the entrance.
+
+-> careful_end
+
+=== walk_away ===
+
+You decide the cave is too dangerous.
+
+Sometimes discretion is the better part of valor.
+
+-> careful_end
+
+=== victory ===
+
+THE END
+
+You found treasure and returned safely!
+
+=== careful_end ===
+
+THE END
+
+You survived, but wonder what you might have missed.

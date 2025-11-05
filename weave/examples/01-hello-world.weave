@@ -1,0 +1,38 @@
+// Example 1: Hello World
+// The simplest possible Weave story
+
+=== start ===
+
+Hello, world!
+
+This is your first Weave story. Pretty simple, right?
+
+What would you like to do?
+
+* [Explore more] -> explore
+* [End the story] -> END
+
+=== explore ===
+
+Great choice! You're exploring the possibilities of Weave.
+
+Weave is a narrative scripting language designed for:
+- Interactive fiction
+- Visual novels
+- Branching dialogue
+- Story-driven games
+
+* [Tell me more] -> more_info
+* [I'm done learning] -> END
+
+=== more_info ===
+
+Weave supports:
+- Branching choices (like this!)
+- Multiple sections and diverts
+- Variables and conditionals (coming soon)
+- Multimedia integration (coming soon)
+
+The syntax is clean and writer-friendly.
+
+-> END

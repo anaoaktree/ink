@@ -1,0 +1,115 @@
+// Example 3: The Merchant
+// Demonstrating dialogue and character interaction
+
+=== start ===
+
+You enter a dusty old shop filled with strange artifacts.
+
+An old merchant looks up from behind the counter.
+
+"Welcome, traveler! Looking for something special?"
+
+* [Ask about the shop] -> about_shop
+* [Ask what they sell] -> what_sell
+* [Leave immediately] -> leave
+
+=== about_shop ===
+
+"Ah, this shop has been in my family for generations," the merchant says.
+
+"We deal in... unusual items. Things you won't find anywhere else."
+
+They lean in conspiratorially.
+
+"Some say cursed. I say... misunderstood."
+
+* [Sounds interesting. What do you have?] -> what_sell
+* [Cursed? No thanks!] -> leave_scared
+
+=== what_sell ===
+
+The merchant gestures around the shop.
+
+"I have potions, scrolls, enchanted weapons... even a few odds and ends whose purpose I'm not quite sure of."
+
+"What catches your eye?"
+
+* [Ask about the glowing amulet] -> amulet
+* [Ask about the ancient book] -> book
+* [Actually, I should go] -> leave
+
+=== amulet ===
+
+"Ah, the Amulet of True Sight," the merchant says, carefully taking it from the shelf.
+
+"They say it lets you see through illusions. Very rare. Very expensive."
+
+"It's yours for... hmm... how about 500 gold pieces?"
+
+* [That's too much!] -> haggle
+* [I'll take it!] -> buy_amulet
+* [Let me look at something else] -> what_sell
+
+=== book ===
+
+The merchant carefully opens the leather-bound tome.
+
+"The Lost Grimoire of Shadows. Very dangerous. Very powerful."
+
+"Are you sure you can handle such knowledge?"
+
+* [Yes, I'll take it] -> buy_book
+* [On second thought...] -> what_sell
+
+=== haggle ===
+
+"Too much?" The merchant chuckles. "Perhaps you're right."
+
+"Tell you what... 350 gold. Final offer."
+
+* [Deal!] -> buy_amulet
+* [Still too expensive] -> what_sell
+
+=== buy_amulet ===
+
+You purchase the Amulet of True Sight.
+
+As you put it on, the shop seems to shimmer...
+
+The merchant winks at you.
+
+"Use it wisely, friend."
+
+-> shop_end
+
+=== buy_book ===
+
+You purchase the ancient grimoire.
+
+The moment it's in your hands, you feel its power.
+
+The merchant nods solemnly.
+
+"May you use that knowledge well."
+
+-> shop_end
+
+=== leave ===
+
+"Come back anytime, traveler! I always have new stock!"
+
+-> shop_end
+
+=== leave_scared ===
+
+You quickly back out of the shop.
+
+Maybe you're not ready for this kind of adventure yet.
+
+-> shop_end
+
+=== shop_end ===
+
+THE END
+
+Thanks for visiting the merchant's shop!
